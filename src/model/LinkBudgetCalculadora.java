@@ -20,6 +20,11 @@ public class LinkBudgetCalculadora {
         if (eq.getPrx() == null) nullCount++;
         if (eq.getPtx() == null) nullCount++;
         if (rede.getDistanciaKm() == null) nullCount++;
+
+        if (nullCount > 1) throw new ValidacaoException("ERRO: Deixe apenas UM campo principal em branco.");
+        if (nullCount == 0) throw new ValidacaoException("ERRO: Apague um campo para calcular.");
+        if (rede.getAtenuacaoFibra() == null) throw new ValidacaoException("ERRO: Atenuação é obrigatória.");
+
         return "Método em construção";
     }
 }
