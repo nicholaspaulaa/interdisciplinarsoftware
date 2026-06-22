@@ -10,4 +10,8 @@ public class LinkBudgetCalculadora {
     private double calcularPtx(Equipamento eq, RedePassiva rede) {
         return eq.getPrx() + calcularPerdaTotal(rede) + eq.getMargem();
     }
+    private double calcularDistancia(Equipamento eq, RedePassiva rede) {
+        double potDisponivel = eq.getPtx() - eq.getPrx() - eq.getMargem() - rede.getPerdasPontuais();
+        return potDisponivel / rede.getAtenuacaoFibra();
+    }
 }
