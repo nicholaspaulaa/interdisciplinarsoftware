@@ -25,6 +25,8 @@ public class LinkBudgetCalculadora {
         if (nullCount == 0) throw new ValidacaoException("ERRO: Apague um campo para calcular.");
         if (rede.getAtenuacaoFibra() == null) throw new ValidacaoException("ERRO: Atenuação é obrigatória.");
 
-        return "Método em construção";
+        if (eq.getPrx() == null) return String.format("Sensibilidade Prx: %.2f dBm", calcularPrx(eq, rede));
+        else if (eq.getPtx() == null) return String.format("Potência Ptx: %.2f dBm", calcularPtx(eq, rede));
+        else return String.format("Distância Máxima: %.2f km", calcularDistancia(eq, rede));
     }
 }
