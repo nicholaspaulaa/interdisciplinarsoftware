@@ -7,5 +7,8 @@ public class ValidadorG984 {
                 throw new ValidacaoException("ALERTA: A atenuação da fibra está fora do padrão (0.20 a 0.45 dB/km).");
             }
         }
+        if (rede.getPerdasPontuais() > 25.0) {
+             throw new ValidacaoException("ALERTA: Perdas pontuais acima de 25dB indicam excesso de splitters.");
+        }
     }
 }
