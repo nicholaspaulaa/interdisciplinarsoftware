@@ -14,4 +14,12 @@ public class LinkBudgetCalculadora {
         double potDisponivel = eq.getPtx() - eq.getPrx() - eq.getMargem() - rede.getPerdasPontuais();
         return potDisponivel / rede.getAtenuacaoFibra();
     }
+
+    public String calcularVariavelFaltante(Equipamento eq, RedePassiva rede) throws ValidacaoException {
+        int nullCount = 0;
+        if (eq.getPrx() == null) nullCount++;
+        if (eq.getPtx() == null) nullCount++;
+        if (rede.getDistanciaKm() == null) nullCount++;
+        return "Método em construção";
+    }
 }
