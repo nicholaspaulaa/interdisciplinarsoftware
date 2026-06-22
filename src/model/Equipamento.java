@@ -10,4 +10,8 @@ public class Equipamento {
         this.prx = prx;
         this.margem = margem;
     }
+
+    public Double getPtx() { return ptx; }
+    public Double getPrx() { return prx; }
+    public Double getMargem() { return margem != null ? margem : 0.0; }
 }
