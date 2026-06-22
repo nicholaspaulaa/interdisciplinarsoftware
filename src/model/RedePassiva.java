@@ -14,4 +14,10 @@ public class RedePassiva {
         this.perdaConectores = conect != null ? conect : 0.0;
         this.perdaFusoes = fusoes != null ? fusoes : 0.0;
     }
+
+    public Double getPerdasPontuais() {
+        return this.perdaSplitters + this.perdaConectores + this.perdaFusoes;
+    }
+    public Double getDistanciaKm() { return distanciaKm; }
+    public Double getAtenuacaoFibra() { return atenuacaoFibra; }
 }
