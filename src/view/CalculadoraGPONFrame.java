@@ -2,47 +2,237 @@ package view;
 
 import controller.CalculadoraController;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class CalculadoraGPONFrame extends JFrame {
-    private JTextField txtPtx = new JTextField(), txtPrx = new JTextField(), txtDist = new JTextField();
-    private JTextField txtAten = new JTextField("0.25"), txtMargem = new JTextField("3.0");
-    private JTextField txtSplitters = new JTextField(), txtConectores = new JTextField(), txtFusoes = new JTextField();
-    private JButton btnCalcular = new JButton("Calcular Faltante");
+    private static final Color COR_FUNDO = new Color(45, 45, 45);
+    private static final Color COR_CAMPO = new Color(60, 60, 60);
+    private static final Color COR_BORDA = new Color(100, 100, 100);
+    private static final Color COR_LARANJA = new Color(255, 122, 0);
+    private static final Color COR_LARANJA_PRESS = new Color(220, 95, 0);
+    private static final Color COR_VERMELHO = new Color(220, 50, 50);
+    private static final Color COR_VERMELHO_PRESS = new Color(180, 30, 30);
+    private static final Color COR_TEXTO = new Color(230, 230, 230);
+    private static final Color COR_VISOR = new Color(30, 30, 30);
+    private static final Font FONTE = new Font("Helvetica", Font.BOLD, 13);
+    private static final Font FONTE_VISOR = new Font("Helvetica", Font.BOLD, 20);
+
+    private VisorCalculadora visor = new VisorCalculadora();
+    private CampoArredondado txtPtx = new CampoArredondado();
+    private CampoArredondado txtPrx = new CampoArredondado();
+    private CampoArredondado txtDist = new CampoArredondado();
+    private CampoArredondado txtAten = new CampoArredondado("0.25");
+    private CampoArredondado txtMargem = new CampoArredondado("3.0");
+    private CampoArredondado txtSplitters = new CampoArredondado();
+    private CampoArredondado txtConectores = new CampoArredondado();
+    private CampoArredondado txtFusoes = new CampoArredondado();
+    private BotaoArredondado btnCalcular = new BotaoArredondado("Calcular Faltante", COR_LARANJA, COR_LARANJA_PRESS);
+    private BotaoArredondado btnLimpar = new BotaoArredondado("Limpar", COR_VERMELHO, COR_VERMELHO_PRESS);
     private CalculadoraController controller = new CalculadoraController();
 
     public CalculadoraGPONFrame() {
         setTitle("Link Budget GPON");
-        setSize(450, 400);
+        setSize(500, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(9, 2, 5, 5));
+        setLocationRelativeTo(null);
 
-        add(new JLabel(" Ptx (dBm):")); add(txtPtx);
-        add(new JLabel(" Prx (dBm):")); add(txtPrx);
-        add(new JLabel(" Distância (km):")); add(txtDist);
-        add(new JLabel(" Atenuação (dB/km):")); add(txtAten);
-        add(new JLabel(" Margem (dB):")); add(txtMargem);
-        add(new JLabel(" Perda Splitters (dB):")); add(txtSplitters);
-        add(new JLabel(" Perda Conectores (dB):")); add(txtConectores);
-        add(new JLabel(" Perda Fusões (dB):")); add(txtFusoes);
-        add(new JLabel(" * Deixe um campo vazio")); add(btnCalcular);
+        JPanel painel = new JPanel(new BorderLayout(0, 12));
+        painel.setBackground(COR_FUNDO);
+        painel.setBorder(new EmptyBorder(20, 24, 20, 24));
 
-        btnCalcular.addActionListener(e -> {
-            try {
-                String resp = controller.processarCalculo(
-                    formatarInput(txtPtx.getText()), formatarInput(txtPrx.getText()), formatarInput(txtMargem.getText()),
-                    formatarInput(txtDist.getText()), formatarInput(txtAten.getText()), formatarInput(txtSplitters.getText()),
-                    formatarInput(txtConectores.getText()), formatarInput(txtFusoes.getText())
-                );
-                JOptionPane.showMessageDialog(this, resp, "Resultado", JOptionPane.INFORMATION_MESSAGE);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erro de digitação: Use apenas números.", "Erro", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        JPanel topo = new JPanel(new BorderLayout(0, 10));
+        topo.setOpaque(false);
+        topo.add(visor, BorderLayout.NORTH);
+
+        JLabel dica = criarLabel("* Deixe um campo vazio");
+        dica.setHorizontalAlignment(SwingConstants.CENTER);
+        topo.add(dica, BorderLayout.SOUTH);
+        painel.add(topo, BorderLayout.NORTH);
+
+        JPanel formulario = new JPanel(new GridLayout(9, 2, 10, 10));
+        formulario.setOpaque(false);
+        formulario.add(criarLabel("Ptx (dBm):"));
+        formulario.add(txtPtx);
+        formulario.add(criarLabel("Prx (dBm):"));
+        formulario.add(txtPrx);
+        formulario.add(criarLabel("Distância (km):"));
+        formulario.add(txtDist);
+        formulario.add(criarLabel("Atenuação (dB/km):"));
+        formulario.add(txtAten);
+        formulario.add(criarLabel("Margem (dB):"));
+        formulario.add(txtMargem);
+        formulario.add(criarLabel("Perda Splitters (dB):"));
+        formulario.add(txtSplitters);
+        formulario.add(criarLabel("Perda Conectores (dB):"));
+        formulario.add(txtConectores);
+        formulario.add(criarLabel("Perda Fusões (dB):"));
+        formulario.add(txtFusoes);
+        formulario.add(centralizarBotao(btnLimpar));
+        formulario.add(centralizarBotao(btnCalcular));
+
+        painel.add(formulario, BorderLayout.CENTER);
+        getContentPane().setBackground(COR_FUNDO);
+        add(painel);
+
+        btnCalcular.addActionListener(e -> calcular());
+        btnLimpar.addActionListener(e -> limparCampos());
+    }
+
+    private JPanel centralizarBotao(JButton botao) {
+        JPanel painel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        painel.setOpaque(false);
+        painel.add(botao);
+        return painel;
+    }
+
+    private JLabel criarLabel(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setFont(FONTE);
+        label.setForeground(COR_TEXTO);
+        label.setBackground(COR_FUNDO);
+        label.setOpaque(true);
+        return label;
+    }
+
+    private void calcular() {
+        try {
+            String resp = controller.processarCalculo(
+                formatarInput(txtPtx.getText()), formatarInput(txtPrx.getText()), formatarInput(txtMargem.getText()),
+                formatarInput(txtDist.getText()), formatarInput(txtAten.getText()), formatarInput(txtSplitters.getText()),
+                formatarInput(txtConectores.getText()), formatarInput(txtFusoes.getText())
+            );
+            visor.atualizar(resp);
+        } catch (Exception ex) {
+            visor.atualizar("Erro de digitação: Use apenas números.");
+        }
+    }
+
+    private void limparCampos() {
+        txtPtx.setText("");
+        txtPrx.setText("");
+        txtDist.setText("");
+        txtAten.setText("0.25");
+        txtMargem.setText("3.0");
+        txtSplitters.setText("");
+        txtConectores.setText("");
+        txtFusoes.setText("");
+        visor.limpar();
+        txtPtx.requestFocusInWindow();
     }
 
     private Double formatarInput(String texto) {
         if (texto == null || texto.trim().isEmpty()) return null;
         return Double.parseDouble(texto.replace(",", "."));
+    }
+
+    private static class VisorCalculadora extends JComponent {
+        private String texto = "";
+
+        public void atualizar(String resultado) {
+            if (resultado.startsWith("ERRO") || resultado.startsWith("ALERTA")) {
+                texto = resultado;
+            } else {
+                texto = resultado.replace(": ", " = ");
+            }
+            repaint();
+        }
+
+        public void limpar() {
+            texto = "";
+            repaint();
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(0, 58);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(COR_VISOR);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
+            g2.setColor(COR_BORDA);
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 16, 16);
+
+            if (!texto.isEmpty()) {
+                g2.setFont(FONTE_VISOR);
+                g2.setColor(COR_TEXTO);
+                FontMetrics fm = g2.getFontMetrics();
+                int x = getWidth() - fm.stringWidth(texto) - 16;
+                int y = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2.drawString(texto, Math.max(x, 16), y);
+            }
+            g2.dispose();
+        }
+    }
+
+    private static class CampoArredondado extends JTextField {
+        public CampoArredondado() {
+            this("");
+        }
+
+        public CampoArredondado(String texto) {
+            super(texto);
+            setFont(FONTE);
+            setForeground(COR_TEXTO);
+            setCaretColor(COR_TEXTO);
+            setOpaque(false);
+            setBorder(new EmptyBorder(8, 12, 8, 12));
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(COR_CAMPO);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
+            g2.setColor(isFocusOwner() ? COR_BORDA : new Color(80, 80, 80));
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 16, 16);
+            g2.dispose();
+            super.paintComponent(g);
+        }
+    }
+
+    private static class BotaoArredondado extends JButton {
+        private final Color corNormal;
+        private final Color corPressionada;
+
+        public BotaoArredondado(String texto, Color corNormal, Color corPressionada) {
+            super(texto);
+            this.corNormal = corNormal;
+            this.corPressionada = corPressionada;
+            setFont(FONTE);
+            setForeground(Color.WHITE);
+            setFocusPainted(false);
+            setBorderPainted(false);
+            setContentAreaFilled(false);
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            Dimension tamanho = new Dimension(180, 38);
+            setPreferredSize(tamanho);
+            setMaximumSize(tamanho);
+            setMinimumSize(tamanho);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            Color cor = getModel().isPressed() ? corPressionada : corNormal;
+            if (!isEnabled()) cor = new Color(80, 80, 80);
+
+            g2.setColor(cor);
+            g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 24, 24);
+
+            FontMetrics fm = g2.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(getText())) / 2;
+            int y = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+            g2.setColor(getForeground());
+            g2.drawString(getText(), x, y);
+            g2.dispose();
+        }
     }
 }
