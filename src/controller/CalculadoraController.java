@@ -1,10 +1,6 @@
 package controller;
 
-import model.Equipamento;
-import model.LinkBudgetCalculadora;
-import model.RedePassiva;
-import model.ValidadorG984;
-import model.ValidacaoException;
+import model.*;
 
 public class CalculadoraController {
     private LinkBudgetCalculadora calculadora;
@@ -13,5 +9,10 @@ public class CalculadoraController {
     public CalculadoraController() {
         this.calculadora = new LinkBudgetCalculadora();
         this.validador = new ValidadorG984();
+    }
+
+    public String processarCalculo(Double ptx, Double prx, Double margem, Double dist,
+                                   Double atenuacao, Double splitters, Double conect, Double fusoes) {
+        return "Recebido";
     }
 }
