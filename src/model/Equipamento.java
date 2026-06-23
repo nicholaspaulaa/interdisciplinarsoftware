@@ -13,5 +13,5 @@ public class Equipamento {
 
     public Double getPtx() { return ptx; }
     public Double getPrx() { return prx; }
-    public Double getMargem() { return margem != null ? margem : 0.0; }
+    public Double getMargem() { return margem; }
 }

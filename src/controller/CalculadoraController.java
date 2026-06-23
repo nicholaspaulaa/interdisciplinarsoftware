@@ -12,7 +12,7 @@ public class CalculadoraController {
             Equipamento eq = new Equipamento(ptx, prx, margem);
             RedePassiva rede = new RedePassiva(dist, aten, splitters, conect, fusoes);
 
-            validador.validarParametrosFisicos(rede);
+            validador.validarParametrosFisicos(eq, rede);
             return calc.calcularVariavelFaltante(eq, rede);
         } catch (ValidacaoException e) {
             return e.getMessage();

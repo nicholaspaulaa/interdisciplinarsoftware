@@ -10,14 +10,22 @@ public class RedePassiva {
     public RedePassiva(Double dist, Double aten, Double splitters, Double conect, Double fusoes) {
         this.distanciaKm = dist;
         this.atenuacaoFibra = aten;
-        this.perdaSplitters = splitters != null ? splitters : 0.0;
-        this.perdaConectores = conect != null ? conect : 0.0;
-        this.perdaFusoes = fusoes != null ? fusoes : 0.0;
+        this.perdaSplitters = splitters;
+        this.perdaConectores = conect;
+        this.perdaFusoes = fusoes;
     }
 
     public Double getPerdasPontuais() {
-        return this.perdaSplitters + this.perdaConectores + this.perdaFusoes;
+        return valorOuZero(this.perdaSplitters) + valorOuZero(this.perdaConectores) + valorOuZero(this.perdaFusoes);
     }
+
+    private Double valorOuZero(Double valor) {
+        return valor != null ? valor : 0.0;
+    }
+
     public Double getDistanciaKm() { return distanciaKm; }
     public Double getAtenuacaoFibra() { return atenuacaoFibra; }
+    public Double getPerdaSplitters() { return perdaSplitters; }
+    public Double getPerdaConectores() { return perdaConectores; }
+    public Double getPerdaFusoes() { return perdaFusoes; }
 }

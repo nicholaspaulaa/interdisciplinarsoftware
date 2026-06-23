@@ -24,9 +24,9 @@ public class CalculadoraGPONFrame extends JFrame {
     private CampoArredondado txtDist = new CampoArredondado();
     private CampoArredondado txtAten = new CampoArredondado("0.25");
     private CampoArredondado txtMargem = new CampoArredondado("3.0");
-    private CampoArredondado txtSplitters = new CampoArredondado();
-    private CampoArredondado txtConectores = new CampoArredondado();
-    private CampoArredondado txtFusoes = new CampoArredondado();
+    private CampoArredondado txtSplitters = new CampoArredondado("0");
+    private CampoArredondado txtConectores = new CampoArredondado("0");
+    private CampoArredondado txtFusoes = new CampoArredondado("0");
     private BotaoArredondado btnCalcular = new BotaoArredondado("Calcular Faltante", COR_LARANJA, COR_LARANJA_PRESS);
     private BotaoArredondado btnLimpar = new BotaoArredondado("Limpar", COR_VERMELHO, COR_VERMELHO_PRESS);
     private CalculadoraController controller = new CalculadoraController();
@@ -45,7 +45,7 @@ public class CalculadoraGPONFrame extends JFrame {
         topo.setOpaque(false);
         topo.add(visor, BorderLayout.NORTH);
 
-        JLabel dica = criarLabel("* Deixe um campo vazio");
+        JLabel dica = criarLabel("* Deixe apenas um campo vazio para calcular");
         dica.setHorizontalAlignment(SwingConstants.CENTER);
         topo.add(dica, BorderLayout.SOUTH);
         painel.add(topo, BorderLayout.NORTH);
@@ -62,7 +62,7 @@ public class CalculadoraGPONFrame extends JFrame {
         formulario.add(txtAten);
         formulario.add(criarLabel("Margem (dB):"));
         formulario.add(txtMargem);
-        formulario.add(criarLabel("Perda Splitters (dB):"));
+        formulario.add(criarLabel("Splitters (dB ou 1:64):"));
         formulario.add(txtSplitters);
         formulario.add(criarLabel("Perda Conectores (dB):"));
         formulario.add(txtConectores);
@@ -99,12 +99,12 @@ public class CalculadoraGPONFrame extends JFrame {
         try {
             String resp = controller.processarCalculo(
                 formatarInput(txtPtx.getText()), formatarInput(txtPrx.getText()), formatarInput(txtMargem.getText()),
-                formatarInput(txtDist.getText()), formatarInput(txtAten.getText()), formatarInput(txtSplitters.getText()),
+                formatarInput(txtDist.getText()), formatarInput(txtAten.getText()), formatarSplitter(txtSplitters.getText()),
                 formatarInput(txtConectores.getText()), formatarInput(txtFusoes.getText())
             );
             visor.atualizar(resp);
         } catch (Exception ex) {
-            visor.atualizar("Erro de digitação: Use apenas números.");
+            visor.atualizar("Erro de digitação: Use números ou splitter 1:64.");
         }
     }
 
@@ -114,9 +114,9 @@ public class CalculadoraGPONFrame extends JFrame {
         txtDist.setText("");
         txtAten.setText("0.25");
         txtMargem.setText("3.0");
-        txtSplitters.setText("");
-        txtConectores.setText("");
-        txtFusoes.setText("");
+        txtSplitters.setText("0");
+        txtConectores.setText("0");
+        txtFusoes.setText("0");
         visor.limpar();
         txtPtx.requestFocusInWindow();
     }
@@ -124,6 +124,24 @@ public class CalculadoraGPONFrame extends JFrame {
     private Double formatarInput(String texto) {
         if (texto == null || texto.trim().isEmpty()) return null;
         return Double.parseDouble(texto.replace(",", "."));
+    }
+
+    private Double formatarSplitter(String texto) {
+        if (texto == null || texto.trim().isEmpty()) return null;
+
+        String valor = texto.trim().replace(",", ".");
+        if (valor.contains(":")) {
+            String[] partes = valor.split(":");
+            if (partes.length != 2) throw new NumberFormatException("Razão de splitter inválida");
+
+            double entrada = Double.parseDouble(partes[0].trim());
+            double saida = Double.parseDouble(partes[1].trim());
+            if (entrada <= 0 || saida <= 0 || saida < entrada) throw new NumberFormatException("Razão de splitter inválida");
+
+            return 10.0 * Math.log10(saida / entrada);
+        }
+
+        return Double.parseDouble(valor);
     }
 
     private static class VisorCalculadora extends JComponent {
