@@ -13,6 +13,8 @@ public class CalculadoraController {
 
     public String processarCalculo(Double ptx, Double prx, Double margem, Double dist,
                                    Double atenuacao, Double splitters, Double conect, Double fusoes) {
-        return "Recebido";
+        Equipamento eq = new Equipamento(ptx, prx, margem);
+        RedePassiva rede = new RedePassiva(dist, atenuacao, splitters, conect, fusoes);
+        return "Processando...";
     }
 }
