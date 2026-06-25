@@ -9,8 +9,13 @@ public class CalculadoraController {
     public String processarCalculo(Double ptx, Double prx, Double margem, Double dist,
                                    Double aten, Double splitters, Double conect, Double fusoes) {
         try {
-            Equipamento eq = new Equipamento(ptx, prx, margem);
-            RedePassiva rede = new RedePassiva(dist, aten, splitters, conect, fusoes);
+            ResolucaoEntrada entrada = ResolucaoEntrada.resolver(
+                    ptx, prx, margem, dist, aten, splitters, conect, fusoes
+            );
+            Equipamento eq = new Equipamento(entrada.ptx, entrada.prx, entrada.margem);
+            RedePassiva rede = new RedePassiva(
+                    entrada.dist, entrada.aten, entrada.splitters, entrada.conect, entrada.fusoes
+            );
 
             validador.validarParametrosFisicos(eq, rede);
             return calc.calcularVariavelFaltante(eq, rede);

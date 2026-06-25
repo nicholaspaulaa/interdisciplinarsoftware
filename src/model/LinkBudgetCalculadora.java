@@ -1,6 +1,9 @@
 package model;
 
+import java.util.Locale;
+
 public class LinkBudgetCalculadora {
+    private static final Locale LOCALE_BR = Locale.forLanguageTag("pt-BR");
     private double calcularPerdaTotal(RedePassiva rede) {
         return (rede.getAtenuacaoFibra() * rede.getDistanciaKm()) + rede.getPerdasPontuais();
     }
@@ -72,13 +75,17 @@ public class LinkBudgetCalculadora {
         if (nullCount > 1) throw new ValidacaoException("ERRO: Deixe apenas UM campo da fórmula em branco.");
         if (nullCount == 0) throw new ValidacaoException("ERRO: Apague um campo para calcular.");
 
-        if (eq.getPtx() == null) return String.format("Potência Ptx: %.2f dBm", calcularPtx(eq, rede));
-        if (eq.getPrx() == null) return String.format("Sensibilidade Prx: %.2f dBm", calcularPrx(eq, rede));
-        if (eq.getMargem() == null) return String.format("Margem de Segurança: %.2f dB", calcularMargem(eq, rede));
-        if (rede.getDistanciaKm() == null) return String.format("Distância Máxima: %.2f km", calcularDistancia(eq, rede));
-        if (rede.getAtenuacaoFibra() == null) return String.format("Atenuação da Fibra: %.2f dB/km", calcularAtenuacao(eq, rede));
-        if (rede.getPerdaSplitters() == null) return String.format("Perda Splitters: %.2f dB", calcularPerdaSplitters(eq, rede));
-        if (rede.getPerdaConectores() == null) return String.format("Perda Conectores: %.2f dB", calcularPerdaConectores(eq, rede));
-        return String.format("Perda Fusões: %.2f dB", calcularPerdaFusoes(eq, rede));
+        if (eq.getPtx() == null) return formatar("Potência Ptx: %.2f dBm", calcularPtx(eq, rede));
+        if (eq.getPrx() == null) return formatar("Sensibilidade Prx: %.2f dBm", calcularPrx(eq, rede));
+        if (eq.getMargem() == null) return formatar("Margem de Segurança: %.2f dB", calcularMargem(eq, rede));
+        if (rede.getDistanciaKm() == null) return formatar("Distância Máxima: %.2f km", calcularDistancia(eq, rede));
+        if (rede.getAtenuacaoFibra() == null) return formatar("Atenuação da Fibra: %.2f dB/km", calcularAtenuacao(eq, rede));
+        if (rede.getPerdaSplitters() == null) return formatar("Perda Splitters: %.2f dB", calcularPerdaSplitters(eq, rede));
+        if (rede.getPerdaConectores() == null) return formatar("Perda Conectores: %.2f dB", calcularPerdaConectores(eq, rede));
+        return formatar("Perda Fusões: %.2f dB", calcularPerdaFusoes(eq, rede));
+    }
+
+    private String formatar(String padrao, double valor) {
+        return String.format(LOCALE_BR, padrao, valor);
     }
 }

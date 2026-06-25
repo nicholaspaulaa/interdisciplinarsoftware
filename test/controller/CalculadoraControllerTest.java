@@ -36,4 +36,24 @@ class CalculadoraControllerTest {
 
         assertEquals("ERRO: Distância não pode ser negativa.", resultado);
     }
+
+    @Test
+    void deveCalcularSplittersComPerdasOpcionaisVazias() {
+        String resultado = controller.processarCalculo(
+                3.0, -17.0, 3.0,
+                20.0, 0.25, null, 1.0, 0.5
+        );
+
+        assertEquals("Perda Splitters: 10,50 dB", resultado);
+    }
+
+    @Test
+    void deveCalcularDistanciaComPerdasOpcionaisVazias() {
+        String resultado = controller.processarCalculo(
+                3.0, -28.0, 3.0,
+                null, 0.25, null, null, null
+        );
+
+        assertEquals("Distância Máxima: 112,00 km", resultado);
+    }
 }

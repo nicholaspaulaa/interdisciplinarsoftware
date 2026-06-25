@@ -22,11 +22,11 @@ public class CalculadoraGPONFrame extends JFrame {
     private CampoArredondado txtPtx = new CampoArredondado();
     private CampoArredondado txtPrx = new CampoArredondado();
     private CampoArredondado txtDist = new CampoArredondado();
-    private CampoArredondado txtAten = new CampoArredondado("0.25");
-    private CampoArredondado txtMargem = new CampoArredondado("3.0");
-    private CampoArredondado txtSplitters = new CampoArredondado("0");
-    private CampoArredondado txtConectores = new CampoArredondado("0");
-    private CampoArredondado txtFusoes = new CampoArredondado("0");
+    private CampoArredondado txtAten = new CampoArredondado("0,25");
+    private CampoArredondado txtMargem = new CampoArredondado("3,0");
+    private CampoArredondado txtSplitters = new CampoArredondado();
+    private CampoArredondado txtConectores = new CampoArredondado();
+    private CampoArredondado txtFusoes = new CampoArredondado();
     private BotaoArredondado btnCalcular = new BotaoArredondado("Calcular Faltante", COR_LARANJA, COR_LARANJA_PRESS);
     private BotaoArredondado btnLimpar = new BotaoArredondado("Limpar", COR_VERMELHO, COR_VERMELHO_PRESS);
     private CalculadoraController controller = new CalculadoraController();
@@ -45,16 +45,16 @@ public class CalculadoraGPONFrame extends JFrame {
         topo.setOpaque(false);
         topo.add(visor, BorderLayout.NORTH);
 
-        JLabel dica = criarLabel("* Deixe apenas um campo vazio para calcular");
+        JLabel dica = criarLabel("* Deixe um campo vazio (perdas vazias = 0 dB)");
         dica.setHorizontalAlignment(SwingConstants.CENTER);
         topo.add(dica, BorderLayout.SOUTH);
         painel.add(topo, BorderLayout.NORTH);
 
         JPanel formulario = new JPanel(new GridLayout(9, 2, 10, 10));
         formulario.setOpaque(false);
-        formulario.add(criarLabel("Ptx (dBm):"));
+        formulario.add(criarRotuloComDescricao("Ptx (dBm):", "Potência de transmissão"));
         formulario.add(txtPtx);
-        formulario.add(criarLabel("Prx (dBm):"));
+        formulario.add(criarRotuloComDescricao("Prx (dBm):", "Sensibilidade de recepção"));
         formulario.add(txtPrx);
         formulario.add(criarLabel("Distância (km):"));
         formulario.add(txtDist);
@@ -95,6 +95,24 @@ public class CalculadoraGPONFrame extends JFrame {
         return label;
     }
 
+    private JPanel criarRotuloComDescricao(String titulo, String descricao) {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+        painel.setOpaque(false);
+        painel.add(criarLabel(titulo));
+        painel.add(criarLabelDescricao(descricao));
+        return painel;
+    }
+
+    private JLabel criarLabelDescricao(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setFont(new Font("Helvetica", Font.PLAIN, 11));
+        label.setForeground(new Color(160, 160, 160));
+        label.setBackground(COR_FUNDO);
+        label.setOpaque(true);
+        return label;
+    }
+
     private void calcular() {
         try {
             String resp = controller.processarCalculo(
@@ -112,11 +130,11 @@ public class CalculadoraGPONFrame extends JFrame {
         txtPtx.setText("");
         txtPrx.setText("");
         txtDist.setText("");
-        txtAten.setText("0.25");
-        txtMargem.setText("3.0");
-        txtSplitters.setText("0");
-        txtConectores.setText("0");
-        txtFusoes.setText("0");
+        txtAten.setText("0,25");
+        txtMargem.setText("3,0");
+        txtSplitters.setText("");
+        txtConectores.setText("");
+        txtFusoes.setText("");
         visor.limpar();
         txtPtx.requestFocusInWindow();
     }
